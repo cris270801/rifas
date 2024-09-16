@@ -1,0 +1,53 @@
+import random
+import time
+import streamlit as st
+
+# Configuración de la página
+st.title("Sorteo Interactivo")
+
+# Variables globales que se mantienen entre recargas
+if 'contador' not in st.session_state:
+    st.session_state.contador = 0
+if 'results' not in st.session_state:
+    st.session_state.results = []
+if 'possible_numbers' not in st.session_state:
+    st.session_state.possible_numbers = list(range(1, 97))
+if 'final_numbers' not in st.session_state:
+    st.session_state.final_numbers = [23, 56, 76, 89, 90, 34, 5, 6, 7, 59]
+
+# Función para reiniciar el sorteo
+def reset_raffle():
+    st.session_state.contador = 0
+    st.session_state.results = []
+    st.session_state.possible_numbers = list(range(1, 97))
+    st.session_state.final_numbers = [23, 56, 76, 89, 90, 34, 5, 6, 7, 59]
+
+# Función para avanzar en el sorteo
+def raffle_step():
+    if st.session_state.contador < 2:
+        # Elegir un número aleatorio de la lista de posibles números
+        n = random.choice(st.session_state.possible_numbers)
+        st.session_state.possible_numbers.remove(n)
+        st.session_state.contador += 1
+        st.session_state.results.append(f"En el intento {st.session_state.contador} salió: {n}")
+    else:
+        # Elegir un número del sorteo final
+        p = random.choice(st.session_state.final_numbers)
+        st.session_state.final_numbers.remove(p)
+        st.session_state.contador += 1
+        st.session_state.results.append(f"En el intento {st.session_state.contador} salió: {p}")
+        st.session_state.results.append(f"\nEl ganador es el número: {p}")
+
+# Botón para iniciar o continuar el sorteo
+if st.button("Iniciar Sorteo" if st.session_state.contador == 0 else "Volver a girar"):
+    # Mostrar mensaje de "Girando ruleta..." durante 5 segundos
+    with st.spinner('Girando ruleta...'):
+        time.sleep(5)
+    raffle_step()
+
+# Mostrar los resultados
+st.text_area("Resultados", value="\n".join(st.session_state.results), height=200)
+
+# Botón para reiniciar el sorteo
+if st.button("Reiniciar Sorteo"):
+    reset_raffle()
